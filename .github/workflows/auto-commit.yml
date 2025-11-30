@@ -1,0 +1,31 @@
+name: Auto Commit
+
+on:
+  schedule:
+    - cron: "30 4 * * *"    # India Time 10:00 AM (UTC 4:30 AM)
+  workflow_dispatch:         # Manual run allowed
+
+jobs:
+  auto-commit-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Update activity file
+        run: |
+          date >> activity.txt
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "bot@example.com"
+          git config --local user.name "Activity Bot"
+          git add .
+          git commit -m "Automated activity update" || echo "No changes to commit"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
